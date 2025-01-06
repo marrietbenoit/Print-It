@@ -1,74 +1,91 @@
-// This is the array containing the images and text for each slide
+// Array with images and text for each slide
 const slides = [
-	{
-		image: "assets/images/slideshow/slide1.jpg",
-		tagLine: "Impressions tous formats <span>en boutique et en ligne</span>"
-	},
-	{
-		image: "assets/images/slideshow/slide2.jpg",
-		tagLine: "Tirages haute définition grand format <span>pour vos bureaux et events</span>"
-	},
-	{
-		image: "assets/images/slideshow/slide3.jpg",
-		tagLine: "Grand choix de couleurs <span>de CMJN aux pantones</span>"
-	},
-	{
-		image: "assets/images/slideshow/slide4.png",
-		tagLine: "Autocollants <span>avec découpe laser sur mesure</span>"
-	}
+    {
+        image: "assets/images/slideshow/slide1.jpg",
+        tagLine: "Impressions tous formats <span>en boutique et en ligne</span>"
+    },
+    {
+        image: "assets/images/slideshow/slide2.jpg",
+        tagLine: "Tirages haute définition grand format <span>pour vos bureaux et events</span>"
+    },
+    {
+        image: "assets/images/slideshow/slide3.jpg",
+        tagLine: "Grand choix de couleurs <span>de CMJN aux pantones</span>"
+    },
+    {
+        image: "assets/images/slideshow/slide4.png",
+        tagLine: "Autocollants <span>avec découpe laser sur mesure</span>"
+    }
 ];
 
-//In order to start at the first slide
-let currentSlideIndex = 0; 
-const imageElement = document.querySelector('.banner-img img'); // Select the image in the banner
-const textElement = document.querySelector('#banner p'); // Select the paragraph in the banner
-const dots = document.querySelectorAll('.dot'); // Select all dots
+// Start at the first slide
+let currentSlide = 0;
 
-// This function updates the carousel to show the current slide
-function showSlide(index) {
-	imageElement.src = slides[index].image; // changes the images in my constant slides
-	textElement.innerHTML = slides[index].tagLine; // Change the text
+// To select elements from HTML file
+const imageElement = document.querySelector('.banner-img img'); // For images
+const textElement = document.querySelector('#banner p');        // For the tagline
+const dotsContainer = document.querySelector('.dots');          // For the navigatin dots
 
-	// Update the dots to highlight the current one
-	dots.forEach((dot, i) => {
-		if (i === index) {
-			dot.classList.add('dot_selected'); // Highlight the current dot
-		} else {
-			dot.classList.remove('dot_selected'); // Remove highlight from other dots
-		}
-	});
+// Function to create navigation dots
+function createDots() {
+    for (let i = 0; i < slides.length; i++) {
+        const dot = document.createElement('span'); // Creating a <span> for each dot
+        dot.classList.add('dot');                  // Adding the "dot" class
+        if (i === 0) dot.classList.add('dot_selected'); // Highlighting the first dot
+        dotsContainer.appendChild(dot);           // add the dots to container (.dot)
+    }
 }
 
-// Functions to go to the next or previous slide
+// Function to update carousel
+function updateSlide() {
+    // Change the image and text
+    imageElement.src = slides[currentSlide].image;
+    textElement.innerHTML = slides[currentSlide].tagLine;
+
+    // Update the dots
+    const allDots = document.querySelectorAll('.dot'); // Select all dots
+    allDots.forEach((dot, index) => {
+        if (index === currentSlide) {
+            dot.classList.add('dot_selected'); // Highlight the active dot
+        } else {
+            dot.classList.remove('dot_selected'); // Remove highlight from others
+        }
+    });
+}
+// Go to the next slide
 function nextSlide() {
-	currentSlideIndex = (currentSlideIndex + 1) % slides.length; // Move to the next slide, (loop to start if needed ..found on internet)
-	showSlide(currentSlideIndex); // Show the updated slide
+    currentSlide = currentSlide + 1; //Go to next slide
+    if (currentSlide > slides.length - 1) { // If it exceeds the last slide index
+        currentSlide = 0; // Go back to the first slide
+    }
+    updateSlide(); // Update the slide display
 }
 
+// Go to the previous slide
 function prevSlide() {
-	currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length; // Move to the previous slide, (loop to start if needed ..found on internet)
-	showSlide(currentSlideIndex); // Show the updated slide
+    currentSlide = currentSlide - 1; //Go to last slide
+    if (currentSlide < 0) { // If it goes below the first slide index
+        currentSlide = slides.length - 1; // Go to the last slide
+    }
+    updateSlide(); // Update the slide display
 }
 
-// Event listeners for next and previous buttons
-document.getElementById('next').addEventListener('click', nextSlide); // button to go forward
-document.getElementById('prev').addEventListener('click', prevSlide); //  button to go backward
+// Add event listeners to the navigation arrows
+document.getElementById('next').addEventListener('click', nextSlide);
+document.getElementById('prev').addEventListener('click', prevSlide);
 
-// Event listeners for dots to jump to specific slides
-dots.forEach((dot, index) => {
-	dot.addEventListener('click', () => {
-		currentSlideIndex = index; // Set the slide index based on dot clicked
-		showSlide(currentSlideIndex); // Show the selected slide
-	});
-});
+// Add click events to the dots
+function addDotEvents() {
+    const allDots = document.querySelectorAll('.dot');
+    allDots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            currentSlide = index; // Set the current slide to the dot's index
+            updateSlide();
+        });
+    });
+}
 
-// Show the first slide initially when the page loads
-showSlide(currentSlideIndex);// which is automatically 0 (the first slide)
-
-
-
-  
-
-
-
-  
+// Initialize the carousel
+createDots();       // Create the navigation dots
+updateSlide();      // Show the first slide
+addDotEvents();     // Enable dot navigation
